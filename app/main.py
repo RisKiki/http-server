@@ -15,8 +15,7 @@ def decode_http_request(request):
     request_lines = request.split(CRLF)
     request_line = request_lines[0]
     request_method, request_path, request_version = request_line.split(" ")
-    headers = request_lines[1:]
-    print(f'headers: {headers}')
+    headers = [header for header in request_lines[1:] if header != ""]
     headers = [header.split(": ") for header in headers]
     headers = {header[0]: header[1] for header in headers}
     print(f"Request method: {request_method}")
