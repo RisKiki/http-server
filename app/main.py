@@ -9,7 +9,7 @@ CRLF = "\r\n"
 
 def decode_http_request(request):
     """
-    Decodes an HTTP request.
+    Decodes an HTTP request. 
     """
     request_lines = request.split(CRLF)
     request_line = request_lines[0]
