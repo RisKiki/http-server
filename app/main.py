@@ -11,6 +11,7 @@ def decode_http_request(request):
     """
     Decodes an HTTP request. 
     """
+    print(f'request: {request}')
     request_lines = request.split(CRLF)
     request_line = request_lines[0]
     request_method, request_path, request_version = request_line.split(" ")
