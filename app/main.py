@@ -1,5 +1,7 @@
 # Uncomment this to pass the first stage
+import argparse
 from http import HTTPStatus
+import os
 import socket
 import multiprocessing
 from typing import Callable
@@ -41,19 +43,34 @@ class HttpResponse:
         self.routes = routes
         self.process()
 
+    def get_status_text_from_code(code : HTTPStatus):
+        if code == HTTPStatus.OK:
+            return 'OK'
+        elif code == HTTPStatus.NOT_FOUND:
+            return 'Not Found'
+        else:
+            return 'Error'
+
     def process(self):
         base = '/'+self.get_params()[0]
         route_function = self.routes.get(base)
         if route_function:
             self.status_code = HTTPStatus.OK
-            self.status_text = 'OK'
-            body, headers = route_function(self.request, self.get_params()[1:])
+            res = route_function(self.request, self.get_params()[1:])
+            if len(res) == 2:
+                body, headers = res
+            if len(res) == 3:
+                body, headers, status_code = res
+                self.status_code = status_code
+            else:
+                headers = {}
+                body = ''
             self.body = body
             self.get_headers_text(headers)
         else:
             self.status_code = HTTPStatus.NOT_FOUND
-            self.status_text = 'Not Found'
-
+        
+        self.status_text = self.get_status_text_from_code(self.status_code)
         self.response()
 
     def get_headers_text(self, headers : dict):
@@ -117,11 +134,37 @@ def stage_5(request:HttpRequest, params):
     }
     return body, headers
 
+def stage_7(requst:HttpRequest, params):
+    headers = {
+        'Content-Type':'application/octet-stream'
+    }
+    filename = params[0]
+    path = filename+directory
+    check_file = os.path.isfile(path)
+    if check_file:
+        f = open(path, "r")
+        body = f.read()
+        return body, headers
+    else:
+        status_code = HTTPStatus.NOT_FOUND
+        return None, headers, status_code
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Run the Flask application with specified environment.')
+    parser.add_argument('--directory', default='dev', help='Specify the environment (default: dev)')
+    return parser.parse_args()
+
+
 def main():
+    args = parse_args()
+    global directory
+    directory = args.directory
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
         "/user-agent" : stage_5,
+        "/files" : stage_7,
     }
     server = Server("localhost", 4221, routes)
     server.start()
