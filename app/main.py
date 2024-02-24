@@ -40,7 +40,6 @@ class HttpResponse:
         self.body = None
         self.allow_routes = allow_routes
         self.process()
-        self.get_response()
 
     def process(self):
         base = '/'+self.get_params()[0]
@@ -51,12 +50,31 @@ class HttpResponse:
             self.status_code = HTTPStatus.OK
             self.status_text = 'OK'
 
+        self.response()
+
+    def get_headers(self):
+        headers = {
+            'Content-Type' : 'text/plain',
+            'Content-Length' : len(self.body)
+        }
+        line = ''
+        for key, value in headers.items():
+            line += f'{key}: {value} {CRLF}'
+
+        self.headers = line
+
+    def get_body(self):
+
+        self.body = '/'.join(map(str, self.get_params()[1:]))
+
     def get_params(self):
         params = self.request.path.split('/')[1:]
         return params
 
-    def get_response(self):
-        self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{CRLF}'
+    def response(self):
+        self.get_body()
+        self.get_headers()
+        self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{self.headers}{CRLF}{self.body}'
 
 def main():
     server_socket = socket.create_server(
@@ -72,25 +90,6 @@ def main():
         request_data = client_connection.recv(1024)
         request = HttpRequest(request_data)
         response = HttpResponse(request, allow_routes)
-        # route = request_path.split('/')[1:]
-        # print(f'route : {route}')
-        # base = "/"+route[0]
-        # if base not in allow_routes:
-        #     status_line = f"{HTTP_VERSION} {HTTPStatus.NOT_FOUND} Not Found{CRLF}{CRLF}"
-        # else:
-        #     body = '/'.join(map(str, route[1:]))
-        #     headers = {
-        #         'Content-Type' : 'text/plain',
-        #         'Content-Length' : len(body)
-        #     }
-        #     line = ''
-        #     for key, value in headers.items():
-        #         line += f'{key}: {value} \n'
-        #     print(body)
-        #     status_line = f"{HTTP_VERSION} {HTTPStatus.OK}{CRLF}{line}{CRLF}{body}{CRLF}"
-
-        # print(repr(response).encode())
-
         print(response.response_text)
         client_connection.sendall(response.response_text.encode())
         client_connection.close()
