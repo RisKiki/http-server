@@ -73,7 +73,9 @@ class HttpResponse:
         return params
 
     def response(self):
-        self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{self.headers}{CRLF}{self.body}'
+        headers = self.headers if self.headers else ''
+        body = self.body if self.body else ''
+        self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
 def main():
     server_socket = socket.create_server(
