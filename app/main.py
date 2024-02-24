@@ -49,6 +49,8 @@ class HttpResponse:
         else:
             self.status_code = HTTPStatus.OK
             self.status_text = 'OK'
+            self.get_body()
+            self.get_headers()
 
         self.response()
 
@@ -64,7 +66,6 @@ class HttpResponse:
         self.headers = line
 
     def get_body(self):
-
         self.body = '/'.join(map(str, self.get_params()[1:]))
 
     def get_params(self):
@@ -72,8 +73,6 @@ class HttpResponse:
         return params
 
     def response(self):
-        self.get_body()
-        self.get_headers()
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{self.headers}{CRLF}{self.body}'
 
 def main():
