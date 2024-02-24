@@ -96,7 +96,7 @@ def stage_5(request:HttpRequest, params):
 def main():
     server_socket = socket.create_server(
         (ADDRESS, PORT), 
-        family=socket.AF_INET, # AF_INET is for IPv4 https://man7.org/linux/man-pages/man2/socket.2.html
+        family=socket.AF_INET, # AF_INET is for IPv4 https://man7.org/linux/man-pages/man2/socket.2.html 
         reuse_port=True
     )
     routes = {
