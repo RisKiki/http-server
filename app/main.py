@@ -61,11 +61,13 @@ class HttpResponse:
             if len(res) == 2:
                 body, headers = res
             elif len(res) == 3:
+                print('res', res)
                 body, headers, status_code = res
                 self.status_code = status_code
             else:
                 headers = {}
                 body = None
+            print("2")
             self.body = body
             self.get_headers_text(headers)
         else:
