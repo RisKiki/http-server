@@ -54,20 +54,18 @@ class HttpResponse:
     def process(self):
         base = '/'+self.get_params()[0]
         route_function = self.routes.get(base)
-        print(base)
+        print('Route : ', base)
         if route_function:
             self.status_code = HTTPStatus.OK
             res = route_function(self.request, self.get_params()[1:])
             if len(res) == 2:
                 body, headers = res
             elif len(res) == 3:
-                print('res', res)
                 body, headers, status_code = res
                 self.status_code = status_code
             else:
                 headers = {}
                 body = None
-            print("2")
             self.body = body
             self.get_headers_text(headers)
         else:
@@ -91,7 +89,7 @@ class HttpResponse:
 
     def response(self):
         headers = self.headers if self.headers else ''
-        body = self.body if self.body else '1'
+        body = self.body if self.body else ''
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
 class Server:
