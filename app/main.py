@@ -91,7 +91,7 @@ class HttpResponse:
 
     def response(self):
         headers = self.headers if self.headers else ''
-        body = self.body if self.body else ''
+        body = self.body if self.body else '1'
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
 class Server:
@@ -150,7 +150,7 @@ def stage_7(request:HttpRequest, params):
         return body, headers
     else:
         status_code = HTTPStatus.NOT_FOUND
-        return '', headers, status_code
+        return None, headers, status_code
 
 
 def parse_args():
@@ -163,7 +163,6 @@ def main():
     args = parse_args()
     global directory
     directory = args.directory
-    print('Directory', directory)
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
