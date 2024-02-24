@@ -1,7 +1,7 @@
 # Uncomment this to pass the first stage
 from http import HTTPStatus
 import socket
-from typing import List, Dict
+from typing import Callable
 ADDRESS = "localhost"
 PORT = 4221
 HTTP_VERSION = "HTTP/1.1"
@@ -32,7 +32,7 @@ class HttpRequest:
         self.headers = headers
 
 class HttpResponse:
-    def __init__(self, request : HttpRequest, routes: Dict[str : function]) -> None:
+    def __init__(self, request : HttpRequest, routes: dict[str : Callable]) -> None:
         self.request = request
         self.version = HTTP_VERSION
         self.status_code = None
