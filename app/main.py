@@ -141,7 +141,7 @@ def stage_7(request:HttpRequest, params):
     }
     filename = params[0]
     print('params', params)
-    path = os.path.join(filename, directory)
+    path = os.path.join(directory, filename)
     print(path)
     check_file = os.path.isfile(path)
     print(check_file)
