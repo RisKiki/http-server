@@ -167,7 +167,8 @@ def main():
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
-        "/user-agent" : stage_5
+        "/user-agent" : stage_5,
+        '/files' : stage_7
     }
     server = Server("localhost", 4221, routes)
     server.start()
