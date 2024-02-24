@@ -97,7 +97,7 @@ def main():
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
-        "/echo" : stage_5,
+        "/az" : stage_5,
 
     }
     print(f"Server listening on {ADDRESS}:{PORT}")
