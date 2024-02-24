@@ -49,8 +49,8 @@ class HttpResponse:
             self.status_code = HTTPStatus.OK
             self.status_text = 'OK'
             body, headers = route_function(self.request, self.get_params()[1:])
-            self.get_headers_text(headers)
             self.body = body
+            self.get_headers_text(headers)
         else:
             self.status_code = HTTPStatus.NOT_FOUND
             self.status_text = 'Not Found'
@@ -60,6 +60,8 @@ class HttpResponse:
     def get_headers_text(self, headers : dict):
         line = ''
         if headers:
+            if self.body:
+                headers = {**headers, 'Content-Length' : len(self.body)}
             for key, value in headers.items():
                     line += f'{key}: {value} {CRLF}'
         self.headers = line
@@ -80,8 +82,7 @@ def stage_3(request, params):
 def stage_4(request, params):
     body = '/'.join(map(str, params))
     headers = {
-        'Content-Type' : 'text/plain',
-        'Content-Length' : len(body)
+        'Content-Type' : 'text/plain'
     }
     return body, headers
 
