@@ -1,7 +1,7 @@
 # Uncomment this to pass the first stage
 from http import HTTPStatus
 import socket
-from typing import List
+from typing import List, Dict
 ADDRESS = "localhost"
 PORT = 4221
 HTTP_VERSION = "HTTP/1.1"
@@ -32,42 +32,36 @@ class HttpRequest:
         self.headers = headers
 
 class HttpResponse:
-    def __init__(self, request : HttpRequest, allow_routes: List[str]) -> None:
+    def __init__(self, request : HttpRequest, routes: Dict[str : function]) -> None:
         self.request = request
         self.version = HTTP_VERSION
         self.status_code = None
         self.status_text = None
         self.body = None
         self.headers = None
-        self.allow_routes = allow_routes
+        self.routes = routes
         self.process()
 
     def process(self):
         base = '/'+self.get_params()[0]
-        if base not in self.allow_routes:
-            self.status_code = HTTPStatus.NOT_FOUND
-            self.status_text = 'Not Found'
-        else:
+        route_function = self.routes.get(base)
+        if route_function:
             self.status_code = HTTPStatus.OK
             self.status_text = 'OK'
-            self.get_body()
-            self.get_headers()
+            body, headers = route_function(self.request, self.get_params()[1:])
+            self.get_headers_text(headers)
+            self.body = body
+        else:
+            self.status_code = HTTPStatus.NOT_FOUND
+            self.status_text = 'Not Found'
 
         self.response()
 
-    def get_headers(self):
-        headers = {
-            'Content-Type' : 'text/plain',
-            'Content-Length' : len(self.body)
-        }
+    def get_headers_text(self, headers : dict):
         line = ''
         for key, value in headers.items():
-            line += f'{key}: {value} {CRLF}'
-
+                line += f'{key}: {value} {CRLF}'
         self.headers = line
-
-    def get_body(self):
-        self.body = '/'.join(map(str, self.get_params()[1:]))
 
     def get_params(self):
         params = self.request.path.split('/')[1:]
@@ -78,20 +72,40 @@ class HttpResponse:
         body = self.body if self.body else ''
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
+
+def stage_3(request, params):
+    return None, None
+
+def stage_4(request, params):
+    body = '/'.join(map(str, params))
+    headers = {
+        'Content-Type' : 'text/plain',
+        'Content-Length' : len(body)
+    }
+    return body, headers
+
+def stage_5(request, params):
+    return None, None
+
 def main():
     server_socket = socket.create_server(
         (ADDRESS, PORT), 
         family=socket.AF_INET, # AF_INET is for IPv4 https://man7.org/linux/man-pages/man2/socket.2.html
         reuse_port=True
     )
-    allow_routes = ["/", "/echo"]
+    routes = {
+        "/" : stage_3,
+        "/echo" : stage_4,
+        "/echo" : stage_5,
+
+    }
     print(f"Server listening on {ADDRESS}:{PORT}")
     while True:
         client_connection, address = server_socket.accept()
         print(f"Connection from {address} has been accepted.")
         request_data = client_connection.recv(1024)
         request = HttpRequest(request_data)
-        response = HttpResponse(request, allow_routes)
+        response = HttpResponse(request, routes)
         print(response.response_text)
         client_connection.sendall(response.response_text.encode())
         client_connection.close()
