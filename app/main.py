@@ -125,6 +125,7 @@ def stage_4(request, params):
     headers = {
         'Content-Type' : 'text/plain'
     }
+    print("body", body)
     return body, headers
 
 def stage_5(request:HttpRequest, params):
