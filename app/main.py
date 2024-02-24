@@ -1,12 +1,11 @@
 # Uncomment this to pass the first stage
 from http import HTTPStatus
 import socket
+import multiprocessing
 from typing import Callable
-ADDRESS = "localhost"
-PORT = 4221
+
 HTTP_VERSION = "HTTP/1.1"
 CRLF = "\r\n"
-
 
 class HttpRequest:
     def __init__(self, request_bytes: bytes):
@@ -75,7 +74,32 @@ class HttpResponse:
         body = self.body if self.body else ''
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
+class Server:
+    def __init__(self, ip, port, routes):
+        self.port = port
+        self.ip = ip
+        self.routes = routes
 
+    def start(self):
+        self.server_socket = socket.create_server(
+            (self.ip, self.port), 
+            family=socket.AF_INET, # AF_INET is for IPv4 https://man7.org/linux/man-pages/man2/socket.2.html 
+            reuse_port=True
+        )
+        print(f"Server listening on {self.ip}:{self.port}")
+        while True:
+            client_connection, address = self.server_socket.accept()
+            multiprocessing.Process(target=self.process, args=(client_connection, address)).start()
+
+    def process(self, client_connection, address):
+        print(f"Connection from {address} has been accepted.")
+        request_data = client_connection.recv(1024)
+        request = HttpRequest(request_data)
+        response = HttpResponse(request, self.routes)
+        print(response.response_text)
+        client_connection.sendall(response.response_text.encode())
+        client_connection.close()
+        
 def stage_3(request, params):
     return None, None
 
@@ -94,27 +118,13 @@ def stage_5(request:HttpRequest, params):
     return body, headers
 
 def main():
-    server_socket = socket.create_server(
-        (ADDRESS, PORT), 
-        family=socket.AF_INET, # AF_INET is for IPv4 https://man7.org/linux/man-pages/man2/socket.2.html 
-        reuse_port=True
-    )
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
         "/user-agent" : stage_5,
-
     }
-    print(f"Server listening on {ADDRESS}:{PORT}")
-    while True:
-        client_connection, address = server_socket.accept()
-        print(f"Connection from {address} has been accepted.")
-        request_data = client_connection.recv(1024)
-        request = HttpRequest(request_data)
-        response = HttpResponse(request, routes)
-        print(response.response_text)
-        client_connection.sendall(response.response_text.encode())
-        client_connection.close()
+    server = Server("localhost", 4221, routes)
+    server.start()
 
 
 if __name__ == "__main__":
