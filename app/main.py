@@ -43,7 +43,7 @@ class HttpResponse:
         self.routes = routes
         self.process()
 
-    def get_status_text_from_code(code : HTTPStatus):
+    def get_status_text_from_code(self, code : HTTPStatus):
         if code == HTTPStatus.OK:
             return 'OK'
         elif code == HTTPStatus.NOT_FOUND:
