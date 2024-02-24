@@ -85,8 +85,12 @@ def stage_4(request, params):
     }
     return body, headers
 
-def stage_5(request, params):
-    return None, None
+def stage_5(request:HttpRequest, params):
+    body = request.headers.get('User-Agent')
+    headers = {
+        'Content-Type' : 'text/plain'
+    }
+    return body, headers
 
 def main():
     server_socket = socket.create_server(
@@ -97,7 +101,7 @@ def main():
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
-        "/az" : stage_5,
+        "/user-agent" : stage_5,
 
     }
     print(f"Server listening on {ADDRESS}:{PORT}")
