@@ -140,6 +140,7 @@ def stage_7(request:HttpRequest, params):
         'Content-Type':'application/octet-stream'
     }
     filename = params[0]
+    print('params', params)
     path = os.path.join(filename, directory)
     print(path)
     check_file = os.path.isfile(path)
