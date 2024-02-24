@@ -113,6 +113,7 @@ class Server:
         request_data = client_connection.recv(1024)
         request = HttpRequest(request_data)
         response = HttpResponse(request, self.routes)
+        print("zizi")
         print(response.response_text)
         client_connection.sendall(response.response_text.encode())
         client_connection.close()
@@ -125,7 +126,6 @@ def stage_4(request, params):
     headers = {
         'Content-Type' : 'text/plain'
     }
-    print("body", body)
     return body, headers
 
 def stage_5(request:HttpRequest, params):
