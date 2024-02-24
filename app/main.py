@@ -57,6 +57,7 @@ class HttpResponse:
         if route_function:
             self.status_code = HTTPStatus.OK
             res = route_function(self.request, self.get_params()[1:])
+            print(res)
             if len(res) == 2:
                 body, headers = res
             elif len(res) == 3:
@@ -64,7 +65,7 @@ class HttpResponse:
                 self.status_code = status_code
             else:
                 headers = {}
-                body = ''
+                body = None
             self.body = body
             self.get_headers_text(headers)
         else:
