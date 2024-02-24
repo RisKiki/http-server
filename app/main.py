@@ -38,6 +38,7 @@ class HttpResponse:
         self.status_code = None
         self.status_text = None
         self.body = None
+        self.headers = None
         self.allow_routes = allow_routes
         self.process()
 
