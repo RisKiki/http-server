@@ -114,7 +114,7 @@ class Server:
         request = HttpRequest(request_data)
         response = HttpResponse(request, self.routes)
         print(response.response_text)
-        print("zizi")
+        print(response.headers)
         client_connection.sendall(response.response_text.encode())
         client_connection.close()
         
