@@ -59,8 +59,9 @@ class HttpResponse:
 
     def get_headers_text(self, headers : dict):
         line = ''
-        for key, value in headers.items():
-                line += f'{key}: {value} {CRLF}'
+        if headers:
+            for key, value in headers.items():
+                    line += f'{key}: {value} {CRLF}'
         self.headers = line
 
     def get_params(self):
