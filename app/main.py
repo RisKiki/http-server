@@ -51,7 +51,7 @@ def main():
             line = ''
             for key, value in headers.items():
                 line += f'{key}: {value} {CRLF}'
-            status_line = f"{HTTP_VERSION} {HTTPStatus.OK}{line}{body}{CRLF}{CRLF}"
+            status_line = f"{HTTP_VERSION} {HTTPStatus.OK}{CRLF}{line}{body}{CRLF}{CRLF}"
         client_connection.sendall(status_line.encode())
         client_connection.close()
 
