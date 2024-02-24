@@ -164,6 +164,7 @@ def main():
     args = parse_args()
     global directory
     directory = args.directory
+    print('Directory', directory)
     routes = {
         "/" : stage_3,
         "/echo" : stage_4,
