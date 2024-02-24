@@ -135,12 +135,13 @@ def stage_5(request:HttpRequest, params):
     }
     return body, headers
 
-def stage_7(requst:HttpRequest, params):
+def stage_7(request:HttpRequest, params):
     headers = {
         'Content-Type':'application/octet-stream'
     }
     filename = params[0]
     path = filename+directory
+    print(path)
     check_file = os.path.isfile(path)
     print(check_file)
     if check_file:
