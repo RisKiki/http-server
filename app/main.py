@@ -59,7 +59,7 @@ class HttpResponse:
             res = route_function(self.request, self.get_params()[1:])
             if len(res) == 2:
                 body, headers = res
-            if len(res) == 3:
+            elif len(res) == 3:
                 body, headers, status_code = res
                 self.status_code = status_code
             else:
@@ -114,7 +114,6 @@ class Server:
         request = HttpRequest(request_data)
         response = HttpResponse(request, self.routes)
         print(response.response_text)
-        print(response.headers)
         client_connection.sendall(response.response_text.encode())
         client_connection.close()
         
