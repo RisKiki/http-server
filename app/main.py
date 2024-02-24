@@ -143,8 +143,8 @@ def stage_7(request:HttpRequest, params):
     path = os.path.join(directory, filename)
     check_file = os.path.isfile(path)
     if check_file:
-        f = open(path, "r")
-        body = f.read()
+        with open(path, "r") as f:
+            body = f.read()
         return body, headers
     else:
         status_code = HTTPStatus.NOT_FOUND
