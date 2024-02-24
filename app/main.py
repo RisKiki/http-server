@@ -140,19 +140,15 @@ def stage_7(request:HttpRequest, params):
         'Content-Type':'application/octet-stream'
     }
     filename = params[0]
-    print('params', params)
     path = os.path.join(directory, filename)
-    print(path)
     check_file = os.path.isfile(path)
-    print(check_file)
     if check_file:
         f = open(path, "r")
         body = f.read()
-        print("bodyyy", body)
         return body, headers
     else:
         status_code = HTTPStatus.NOT_FOUND
-        return None, headers, status_code
+        return '', headers, status_code
 
 
 def parse_args():
