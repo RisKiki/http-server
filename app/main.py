@@ -54,10 +54,10 @@ class HttpResponse:
     def process(self):
         base = '/'+self.get_params()[0]
         route_function = self.routes.get(base)
+        print(base)
         if route_function:
             self.status_code = HTTPStatus.OK
             res = route_function(self.request, self.get_params()[1:])
-            print(res)
             if len(res) == 2:
                 body, headers = res
             elif len(res) == 3:
