@@ -26,8 +26,11 @@ class HttpRequest:
         request_method, request_path, request_version = request_line.split(" ")
         headers = [header for header in request_lines[1:] if header != ""]
         body = headers[-1] if len(headers) > 0 else None
+        print('BODY', body)
         if body and len(body.split(": ")) == 1:
+            print('header 1', headers)
             headers = headers[1:]
+            print('header 2', headers)
         else:
             body = None
         headers = [header.split(": ") for header in headers]
