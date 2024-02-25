@@ -31,7 +31,7 @@ class HttpRequest:
         self.path = request_path
         self.version = request_version
         self.headers = headers
-        self.base = '/'+self.path.split('/')[1:]()[0]
+        self.base = '/'+self.path.split('/')[1:][0]
 
 class HttpResponse:
     def __init__(self, request : HttpRequest, func: Callable) -> None:
