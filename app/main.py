@@ -23,6 +23,7 @@ class HttpRequest:
             raise ValueError("Error decoding request bytes") from e
         request_lines = self.request_text.split(CRLF)
         request_line = request_lines[0]
+        print('caaaaa', request_line)
         request_method, request_path, request_version = request_line.split(" ")
         headers = [header for header in request_lines[1:] if header != ""]
         print('HEADERS', headers)
