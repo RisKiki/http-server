@@ -92,11 +92,11 @@ class HttpResponse:
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
 class Server:
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, accept_method = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'TRACE', 'CONNECT']):
         self.port = port
         self.ip = ip
-        self.routes = {}
-        self.http_method = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'TRACE', 'CONNECT']
+        self.routes = {x : {} for x in accept_method}
+        self.accept_method = accept_method
 
     def start(self):
         self.server_socket = socket.create_server(
@@ -126,7 +126,7 @@ class Server:
 
     def route(self, route, method):
         def decorator(func):
-            self.routes[method] = {route : func}
+            self.routes[method][route] = func 
             def inner_wrapper(*args, **kwargs):
                 # Utilisez param1 et param2 ici
                 print("Paramètres du wrapper :", route, method)
@@ -190,6 +190,7 @@ def main():
     args = parse_args()
     global directory
     directory = args.directory
+    print(app.routes)
     app.start()
 
 
