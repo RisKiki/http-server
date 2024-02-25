@@ -25,6 +25,7 @@ class HttpRequest:
         request_line = request_lines[0]
         request_method, request_path, request_version = request_line.split(" ")
         headers = [header for header in request_lines[1:] if header != ""]
+        print('HEADERS', headers)
         headers = [header.split(": ") for header in headers]
         headers = {header[0]: header[1] for header in headers}
         self.method = request_method
@@ -190,7 +191,6 @@ def main():
     args = parse_args()
     global directory
     directory = args.directory
-    print(app.routes)
     app.start()
 
 if __name__ == "__main__":
