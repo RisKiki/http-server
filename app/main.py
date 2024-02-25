@@ -139,42 +139,45 @@ class Server:
                 return result
             return inner_wrapper
         return decorator
-        
-@server.route('/', 'GET')
-def stage_3(request, params):
-    return None, None
+    
+app = Server("localhost", 4221)
 
-@server.route('/echo', 'GET')
-def stage_4(request, params):
-    body = '/'.join(map(str, params))
-    headers = {
-        'Content-Type' : 'text/plain'
-    }
-    return body, headers
+class Api:
+    @app.route('/', 'GET')
+    def stage_3(request, params):
+        return None, None
 
-@server.route('/user-agent', 'GET')
-def stage_5(request:HttpRequest, params):
-    body = request.headers.get('User-Agent')
-    headers = {
-        'Content-Type' : 'text/plain'
-    }
-    return body, headers
-
-@server.route('/files', 'GET')
-def stage_7(request:HttpRequest, params):
-    headers = {
-        'Content-Type':'application/octet-stream'
-    }
-    filename = params[0]
-    path = os.path.join(directory, filename)
-    check_file = os.path.isfile(path)
-    if check_file:
-        with open(path, "r") as f:
-            body = f.read()
+    @app.route('/echo', 'GET')
+    def stage_4(request, params):
+        body = '/'.join(map(str, params))
+        headers = {
+            'Content-Type' : 'text/plain'
+        }
         return body, headers
-    else:
-        status_code = HTTPStatus.NOT_FOUND
-        return None, headers, status_code
+
+    @app.route('/user-agent', 'GET')
+    def stage_5(request:HttpRequest, params):
+        body = request.headers.get('User-Agent')
+        headers = {
+            'Content-Type' : 'text/plain'
+        }
+        return body, headers
+
+    @app.route('/files', 'GET')
+    def stage_7(request:HttpRequest, params):
+        headers = {
+            'Content-Type':'application/octet-stream'
+        }
+        filename = params[0]
+        path = os.path.join(directory, filename)
+        check_file = os.path.isfile(path)
+        if check_file:
+            with open(path, "r") as f:
+                body = f.read()
+            return body, headers
+        else:
+            status_code = HTTPStatus.NOT_FOUND
+            return None, headers, status_code
 
 
 def parse_args():
@@ -187,9 +190,7 @@ def main():
     args = parse_args()
     global directory
     directory = args.directory
-    global server
-    server = Server("localhost", 4221)
-    server.start()
+    app.start()
 
 
 if __name__ == "__main__":
