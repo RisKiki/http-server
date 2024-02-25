@@ -77,8 +77,7 @@ class HttpResponse:
     def get_headers_text(self, headers : dict):
         line = ''
         if headers:
-            if self.body:
-                headers = {**headers, 'Content-Length' : len(self.body)}
+            headers = {**headers, 'Content-Length' : len(self.body) if self.body else 0}
             for key, value in headers.items():
                     line += f'{key}: {value} {CRLF}'
         self.headers = line
