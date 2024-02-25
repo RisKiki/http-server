@@ -29,7 +29,7 @@ class HttpRequest:
         print('BODY', body)
         if body and len(body.split(": ")) == 1:
             print('header 1', headers)
-            headers = headers[1:]
+            headers = headers[:-1]
             print('header 2', headers)
         else:
             body = None
