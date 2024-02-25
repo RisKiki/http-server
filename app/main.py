@@ -64,7 +64,7 @@ class HttpResponse:
                 body, headers, status_code = res
                 self.status_code = status_code
             else:
-                headers = {}
+                headers = None
                 body = None
             self.body = body
             self.get_headers_text(headers)
