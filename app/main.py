@@ -27,12 +27,18 @@ class HttpRequest:
         request_method, request_path, request_version = request_line.split(" ")
         headers = [header for header in request_lines[1:] if header != ""]
         print('HEADERS', headers)
+        body = headers[-1]
+        if len(body.split(": ")) == 1:
+            headers = headers[1:]
+        else:
+            body = None
         headers = [header.split(": ") for header in headers]
         headers = {header[0]: header[1] for header in headers}
         self.method = request_method
         self.path = request_path
         self.version = request_version
         self.headers = headers
+        self.body = body
         self.base = '/'+self.path.split('/')[1:][0]
 
 class HttpResponse:
@@ -51,6 +57,10 @@ class HttpResponse:
             return 'OK'
         elif code == HTTPStatus.NOT_FOUND:
             return 'Not Found'
+        elif code == HTTPStatus.CREATED:
+            return 'Created'
+        elif code == HTTPStatus.INTERNAL_SERVER_ERROR:
+            return 'Internal Server Error'
         else:
             return 'Error'
 
@@ -180,6 +190,18 @@ class Api:
         else:
             status_code = HTTPStatus.NOT_FOUND
             return None, headers, status_code
+        
+    @app.route('/files', 'POST')
+    def stage_8(request:HttpRequest, params):
+        content_file = request.body
+        filename = params[0]
+        path = os.path.join(directory, filename)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        # Créer le fichier
+        with open(path, 'w') as f:
+            f.write(content_file)
+
+        return None, None, HTTPStatus.CREATED
 
 
 def parse_args():
