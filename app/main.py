@@ -135,23 +135,20 @@ def stage_5(request:HttpRequest, params):
     }
     return body, headers
 
-def stage_7(request, params):
+def stage_7(request:HttpRequest, params):
     headers = {
-        'Content-Type': 'application/octet-stream'
+        'Content-Type':'application/octet-stream'
     }
     filename = params[0]
     path = os.path.join(directory, filename)
-    try:
-        if os.path.isfile(path):
-            with open(path, "r") as f:
-                body = f.read()
-            return body, headers
-        else:
-            return None, headers, HTTPStatus.NOT_FOUND
-    except Exception as e:
-        # Gérer les exceptions lors de la lecture du fichier
-        print(f"An error occurred while reading the file: {e}")
-        return None, headers, HTTPStatus.INTERNAL_SERVER_ERROR
+    check_file = os.path.isfile(path)
+    if check_file:
+        with open(path, "r") as f:
+            body = f.read()
+        return body, headers
+    else:
+        status_code = HTTPStatus.NOT_FOUND
+        return None, headers, status_code
 
 
 def parse_args():
