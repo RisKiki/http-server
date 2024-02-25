@@ -31,16 +31,17 @@ class HttpRequest:
         self.path = request_path
         self.version = request_version
         self.headers = headers
+        self.base = '/'+self.path.split('/')[1:]()[0]
 
 class HttpResponse:
-    def __init__(self, request : HttpRequest, routes: dict[str : Callable]) -> None:
+    def __init__(self, request : HttpRequest, func: Callable) -> None:
         self.request = request
         self.version = HTTP_VERSION
         self.status_code = None
         self.status_text = None
         self.body = None
         self.headers = None
-        self.routes = routes
+        self.func = func
         self.process()
 
     def get_status_text_from_code(self, code : HTTPStatus):
@@ -53,11 +54,10 @@ class HttpResponse:
 
     def process(self):
         base = '/'+self.get_params()[0]
-        route_function = self.routes.get(base)
         print('Route : ', base)
-        if route_function:
+        if self.func:
             self.status_code = HTTPStatus.OK
-            res = route_function(self.request, self.get_params()[1:])
+            res = self.func(self.request, self.get_params()[1:])
             if len(res) == 2:
                 body, headers = res
             elif len(res) == 3:
@@ -92,10 +92,11 @@ class HttpResponse:
         self.response_text = f'{self.version} {self.status_code} {self.status_text}{CRLF}{headers}{CRLF}{body}'
 
 class Server:
-    def __init__(self, ip, port, routes):
+    def __init__(self, ip, port):
         self.port = port
         self.ip = ip
-        self.routes = routes
+        self.routes = {}
+        self.http_method = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'TRACE', 'CONNECT']
 
     def start(self):
         self.server_socket = socket.create_server(
@@ -112,16 +113,38 @@ class Server:
         print(f"Connection from {address} has been accepted.")
         request_data = client_connection.recv(1024)
         request = HttpRequest(request_data)
-        response = HttpResponse(request, self.routes)
+        if self.routes.get(request.method):
+            func = self.routes.get(request.method).get(request.base)
+        else:
+            func = None
+        response = HttpResponse(request, func)
         print("*******************")
         print(response.response_text.encode())
         print("*******************")
         client_connection.sendall(response.response_text.encode())
         client_connection.close()
+
+    def route(self, route, method):
+        def decorator(func):
+            self.routes[method] = {route : func}
+            def inner_wrapper(*args, **kwargs):
+                # Utilisez param1 et param2 ici
+                print("Paramètres du wrapper :", route, method)
+                # Code avant l'appel de la fonction
+                print("Avant l'appel de la fonction")
+                # Appel de la fonction originale
+                result = func(*args, **kwargs)
+                # Code après l'appel de la fonction
+                print("Après l'appel de la fonction")
+                return result
+            return inner_wrapper
+        return decorator
         
+@server.route('/', 'GET')
 def stage_3(request, params):
     return None, None
 
+@server.route('/echo', 'GET')
 def stage_4(request, params):
     body = '/'.join(map(str, params))
     headers = {
@@ -129,6 +152,7 @@ def stage_4(request, params):
     }
     return body, headers
 
+@server.route('/user-agent', 'GET')
 def stage_5(request:HttpRequest, params):
     body = request.headers.get('User-Agent')
     headers = {
@@ -136,6 +160,7 @@ def stage_5(request:HttpRequest, params):
     }
     return body, headers
 
+@server.route('/files', 'GET')
 def stage_7(request:HttpRequest, params):
     headers = {
         'Content-Type':'application/octet-stream'
@@ -162,13 +187,8 @@ def main():
     args = parse_args()
     global directory
     directory = args.directory
-    routes = {
-        "/" : stage_3,
-        "/echo" : stage_4,
-        "/user-agent" : stage_5,
-        '/files' : stage_7
-    }
-    server = Server("localhost", 4221, routes)
+    global server
+    server = Server("localhost", 4221)
     server.start()
 
 
